@@ -3,8 +3,8 @@
  * Plugin Name: EBR Ads
  * Plugin URI:  https://github.com/cadastrux/ebr-ads
  * Update URI:  https://github.com/cadastrux/ebr-ads
- * Description: Gerenciador de anúncios enxuto: inserção automática por posição, shortcode, widget e condições de exibição. Sem tracking, sem endpoints públicos. Atualizações via releases do GitHub.
- * Version:     1.2.0
+ * Description: Gerenciador de anúncios enxuto: inserção automática por posição, shortcode, widget e condições de exibição. Sem tracking, sem endpoints públicos. Atualizações via tags do GitHub.
+ * Version:     1.2.1
  * Author:      EBR Network
  * License:     GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -18,8 +18,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
-// Precisa bater com o cabeçalho "Version" acima — a Action de release verifica.
-define( 'EBR_ADS_VERSION', '1.2.0' );
+// Precisa bater com o cabeçalho "Version" acima e com o tag do GitHub (v1.2.1).
+define( 'EBR_ADS_VERSION', '1.2.1' );
 define( 'EBR_ADS_FILE', __FILE__ );
 define( 'EBR_ADS_DIR', plugin_dir_path( __FILE__ ) );
 define( 'EBR_ADS_URL', plugin_dir_url( __FILE__ ) );

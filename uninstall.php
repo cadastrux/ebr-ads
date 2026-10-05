@@ -14,7 +14,8 @@ defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
 delete_option( 'ebr_ads_settings' );
 delete_option( 'ebr_ads_import_done' );
-delete_site_transient( 'ebr_ads_github_release' );
+delete_site_transient( 'ebr_ads_github_tag' );
+delete_site_transient( 'ebr_ads_github_release' ); // Cache da 1.1.x–1.2.0.
 
 // Multisite: a mesma limpeza, site a site. Sem tocar em nada fora da rede.
 if ( is_multisite() ) {

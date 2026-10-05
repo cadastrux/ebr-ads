@@ -4,7 +4,7 @@ Tags: ads, adsense, advertising, banner
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,8 +47,8 @@ Cada item abaixo é uma decisão de projeto tomada depois de auditar o QUADS.
 * **Não coleta dado nenhum de visitante.** Sem IP, sem user agent, sem
   referrer, sem cookies.
 * **Não envia dado a serviço externo.** Sem telemetria, sem licenciamento
-  remoto. A única conexão de saída é a consulta, a cada 6 horas, da última
-  release em `api.github.com` (somente leitura, sem token, com User-Agent
+  remoto. A única conexão de saída é a consulta, a cada 6 horas, dos tags
+  de versão em `api.github.com` (somente leitura, sem token, com User-Agent
   próprio — a URL do site não é enviada).
 * **Não escreve arquivos no disco**, inclusive `ads.txt`.
 * **Não executa SQL.** Não há uma única chamada a `$wpdb`.
@@ -120,14 +120,20 @@ Quem pode marcar é quem pode editar aquele post — não é preciso ter
 
 = Como o plugin é atualizado? =
 
-Pelas releases de https://github.com/cadastrux/ebr-ads. O WordPress mostra a
-versão nova em **Plugins** como qualquer outro plugin; para instalar sozinho,
-clique em "Ativar atualizações automáticas" na linha do EBR Ads.
+Pelos tags de https://github.com/cadastrux/ebr-ads. Quando existe um tag
+`vX.Y.Z` maior que a versão instalada, o WordPress mostra o aviso clássico de
+nova versão em **Plugins**, com "Atualizar agora".
 
-Para publicar uma versão: altere `Version:` e `EBR_ADS_VERSION` em
-`ebr-ads.php` (os dois iguais), adicione a entrada no Changelog abaixo e faça
-push em `main`. A GitHub Action cria a tag `vX.Y.Z` e a release com o
-`ebr-ads.zip`. Push sem mudança de versão não gera release.
+Para publicar uma versão:
+
+1. Em `ebr-ads.php`, altere `Version:` e `EBR_ADS_VERSION` (os dois iguais
+   ao tag que será criado). Em `readme.txt`, `Stable tag` e o Changelog.
+2. `git commit -am "Versão 1.2.2"`
+3. `git tag v1.2.2`
+4. `git push origin main --tags`
+
+O tag precisa bater com a versão do arquivo: se o tag for maior, o site
+instala e continua vendo "nova versão" para sempre.
 
 = Posso rodar a importação de novo? =
 
@@ -142,6 +148,11 @@ pessoal sem consentimento. Os números do AdSense são a fonte confiável de
 qualquer forma — os do plugin nunca batem com os da rede.
 
 == Changelog ==
+
+= 1.2.1 =
+* Versionamento só por tags do GitHub (`vX.Y.Z`): sem GitHub Action e sem
+  release. O pacote é o zip que o GitHub gera para o tag.
+* O modal "Ver detalhes da versão" mostra este Changelog.
 
 = 1.2.0 =
 * Nova posição "After Class": insere o anúncio logo depois do elemento com a

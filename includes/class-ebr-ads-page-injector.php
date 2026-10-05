@@ -121,17 +121,33 @@ class EBR_Ads_Page_Injector {
 			return $html;
 		}
 
-		return self::apply( $html, self::$active );
+		$settings = EBR_Ads_Store::get();
+
+		return self::apply( $html, self::$active, (int) $settings['max_ads'] );
 	}
 
 	/**
 	 * Insere os anúncios de todas as posições ativas, numa única passada.
 	 *
+	 * O limite é conferido contra os anúncios que ESTÃO na página pronta, e não
+	 * contra o contador do request: o contador também registra anúncios que
+	 * foram inseridos e depois descartados pelo tema (resumos, the_content
+	 * chamado só para medir texto...). Na página final não há o que adivinhar.
+	 *
 	 * @param string $html   HTML da página.
 	 * @param array  $active chave => { class, all, html }.
+	 * @param int    $max    Limite de anúncios por página (0 = ilimitado).
 	 * @return string
 	 */
-	public static function apply( $html, array $active ) {
+	public static function apply( $html, array $active, $max = 0 ) {
+		$budget = PHP_INT_MAX;
+		if ( $max > 0 ) {
+			$budget = $max - preg_match_all( '#<div class="ebr-ad ebr-ad--#', $html );
+			if ( $budget <= 0 ) {
+				return $html;
+			}
+		}
+
 		// Offset => HTML a inserir ali. Duas posições no mesmo ponto saem na
 		// ordem do painel (class1 antes de class2).
 		$plan = array();
@@ -159,10 +175,10 @@ class EBR_Ads_Page_Injector {
 			foreach ( $ads as $ad ) {
 				// Estas posições são resolvidas por último na página, então são
 				// elas que cedem quando o limite de anúncios já foi atingido.
-				if ( ! EBR_Ads_Conditions::can_render_more() ) {
-					break 2;
+				if ( $budget <= 0 ) {
+					break;
 				}
-				EBR_Ads_Conditions::count_render();
+				$budget--;
 				$chunk .= $ad;
 			}
 

@@ -4,7 +4,7 @@ Tags: ads, adsense, advertising, banner
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.2.2
+Stable tag: 1.2.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -148,6 +148,14 @@ pessoal sem consentimento. Os números do AdSense são a fonte confiável de
 qualquer forma — os do plugin nunca batem com os da rede.
 
 == Changelog ==
+
+= 1.2.3 =
+* Correção: em listagens com resumo (categorias com lista de posts), o
+  WordPress gera cada resumo passando o post por the_content. Os anúncios
+  inseridos ali sumiam do resumo, mas consumiam o limite por página — e o
+  "After Class" ficava sem vaga. A inserção agora não roda nos resumos.
+* "After Class" confere o limite contra os anúncios realmente presentes na
+  página.
 
 = 1.2.2 =
 * Segunda posição "After Class": dois anúncios, cada um depois de uma classe

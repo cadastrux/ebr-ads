@@ -47,6 +47,14 @@ class EBR_Ads_Injector {
 			return $content;
 		}
 
+		// Resumo de listagem: wp_trim_excerpt() passa o conteúdo inteiro por
+		// the_content e depois remove as tags. O anúncio inserido aqui some do
+		// resumo, mas contaria no limite por página — numa categoria com nove
+		// posts, o limite se esgotava em anúncios invisíveis.
+		if ( doing_filter( 'get_the_excerpt' ) ) {
+			return $content;
+		}
+
 		if ( ! EBR_Ads_Conditions::should_display() ) {
 			return $content;
 		}

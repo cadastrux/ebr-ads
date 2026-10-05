@@ -20,16 +20,18 @@ defined( 'ABSPATH' ) || exit;
 
 class EBR_Ads_Page_Injector {
 
-	const POSITION = 'class1';
-
 	/** Elementos sem tag de fechamento: o anúncio entra logo após a abertura. */
 	const VOID_TAGS = array( 'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr' );
 
 	/** Nunca inserir depois destes, mesmo que tenham a classe. */
 	const SKIP_TAGS = array( 'html', 'head', 'body' );
 
-	/** HTML do anúncio, montado antes de abrir o buffer. */
-	private static $ad_html = '';
+	/**
+	 * Posições ativas nesta página, montadas antes de abrir o buffer.
+	 *
+	 * @var array chave => { class, all, html }
+	 */
+	private static $active = array();
 
 	/**
 	 * Registra os hooks.
@@ -41,28 +43,34 @@ class EBR_Ads_Page_Injector {
 	}
 
 	/**
-	 * Configuração da posição, se ela estiver ativa e com classe válida.
+	 * Posições "After Class" ativas e com classe válida, na ordem do painel.
 	 *
-	 * @return array|null
+	 * @return array chave => configuração
 	 */
-	private static function config() {
+	private static function configs() {
 		$settings = EBR_Ads_Store::get();
-		$config   = isset( $settings['positions'][ self::POSITION ] ) ? $settings['positions'][ self::POSITION ] : null;
+		$out      = array();
 
-		if ( empty( $config['enabled'] ) || empty( $config['class_name'] ) ) {
-			return null;
+		foreach ( EBR_Ads_Schema::positions() as $key => $meta ) {
+			if ( empty( $meta['class'] ) || ! isset( $settings['positions'][ $key ] ) ) {
+				continue;
+			}
+			$config = $settings['positions'][ $key ];
+			if ( ! empty( $config['enabled'] ) && ! empty( $config['class_name'] ) ) {
+				$out[ $key ] = $config;
+			}
 		}
 
-		return $config;
+		return $out;
 	}
 
 	/**
-	 * Decide, antes do template, se esta página recebe o anúncio; se sim,
+	 * Decide, antes do template, se esta página recebe os anúncios; se sim,
 	 * abre o buffer.
 	 */
 	public static function maybe_buffer() {
-		$config = self::config();
-		if ( ! $config ) {
+		$configs = self::configs();
+		if ( ! $configs ) {
 			return;
 		}
 
@@ -80,29 +88,31 @@ class EBR_Ads_Page_Injector {
 		// Renderizado aqui, e não dentro do callback do buffer: em um handler de
 		// output buffering o PHP não permite ob_start(), e um filtro de terceiro
 		// em ebr_ads_render que o usasse derrubaria a página.
-		self::$ad_html = EBR_Ads_Renderer::render( EBR_Ads_Store::resolve_ad( $config['ad'] ), 'class' );
-		if ( '' === self::$ad_html ) {
-			return;
+		self::$active = array();
+		foreach ( $configs as $key => $config ) {
+			$html = EBR_Ads_Renderer::render( EBR_Ads_Store::resolve_ad( $config['ad'] ), 'class' );
+			if ( '' !== $html ) {
+				self::$active[ $key ] = array(
+					'class' => $config['class_name'],
+					'all'   => ! empty( $config['flag'] ),
+					'html'  => $html,
+				);
+			}
 		}
 
-		ob_start( array( __CLASS__, 'filter_page' ) );
+		if ( self::$active ) {
+			ob_start( array( __CLASS__, 'filter_page' ) );
+		}
 	}
 
 	/**
-	 * Callback do buffer: insere o anúncio na página pronta.
+	 * Callback do buffer: insere os anúncios na página pronta.
 	 *
 	 * @param string $html HTML da página.
 	 * @return string
 	 */
 	public static function filter_page( $html ) {
-		$config = self::config();
-
-		if ( ! $config || '' === self::$ad_html || ! is_string( $html ) ) {
-			return $html;
-		}
-
-		// Atalho barato antes de qualquer regex.
-		if ( false === strpos( $html, $config['class_name'] ) ) {
+		if ( ! self::$active || ! is_string( $html ) ) {
 			return $html;
 		}
 
@@ -111,19 +121,52 @@ class EBR_Ads_Page_Injector {
 			return $html;
 		}
 
-		$points = self::insertion_points( $html, $config['class_name'], ! empty( $config['flag'] ) );
+		return self::apply( $html, self::$active );
+	}
+
+	/**
+	 * Insere os anúncios de todas as posições ativas, numa única passada.
+	 *
+	 * @param string $html   HTML da página.
+	 * @param array  $active chave => { class, all, html }.
+	 * @return string
+	 */
+	public static function apply( $html, array $active ) {
+		// Offset => HTML a inserir ali. Duas posições no mesmo ponto saem na
+		// ordem do painel (class1 antes de class2).
+		$plan = array();
+
+		foreach ( $active as $position ) {
+			// Atalho barato antes de qualquer regex.
+			if ( false === strpos( $html, $position['class'] ) ) {
+				continue;
+			}
+			foreach ( self::insertion_points( $html, $position['class'], $position['all'] ) as $at ) {
+				$plan[ $at ][] = $position['html'];
+			}
+		}
+
+		if ( ! $plan ) {
+			return $html;
+		}
+
+		ksort( $plan );
 
 		$out  = '';
 		$last = 0;
-		foreach ( $points as $at ) {
-			// Esta posição é resolvida por último na página, então é ela que
-			// cede quando o limite de anúncios já foi atingido.
-			if ( ! EBR_Ads_Conditions::can_render_more() ) {
-				break;
+		foreach ( $plan as $at => $ads ) {
+			$chunk = '';
+			foreach ( $ads as $ad ) {
+				// Estas posições são resolvidas por último na página, então são
+				// elas que cedem quando o limite de anúncios já foi atingido.
+				if ( ! EBR_Ads_Conditions::can_render_more() ) {
+					break 2;
+				}
+				EBR_Ads_Conditions::count_render();
+				$chunk .= $ad;
 			}
-			EBR_Ads_Conditions::count_render();
 
-			$out .= substr( $html, $last, $at - $last ) . self::$ad_html;
+			$out .= substr( $html, $last, $at - $last ) . $chunk;
 			$last = $at;
 		}
 

@@ -284,6 +284,7 @@ class EBR_Ads_Admin {
 				__( 'after Image\'s outer <div> wp-caption if any.', 'ebr-ads' )
 			);
 			self::class_row( 'class1', $positions );
+			self::class_row( 'class2', $positions );
 			?>
 			</tbody>
 		</table>

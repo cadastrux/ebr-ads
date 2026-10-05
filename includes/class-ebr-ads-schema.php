@@ -43,6 +43,7 @@ class EBR_Ads_Schema {
 			// Depois de um elemento com esta classe CSS, em qualquer lugar da
 			// página — ver EBR_Ads_Page_Injector.
 			'class1'    => array( 'label' => __( 'After Class', 'ebr-ads' ), 'class' => true ),
+			'class2'    => array( 'label' => __( 'After Class', 'ebr-ads' ), 'class' => true ),
 		);
 	}
 

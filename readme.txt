@@ -4,7 +4,7 @@ Tags: ads, adsense, advertising, banner
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,10 +19,10 @@ pagamento.
 = O que faz =
 
 * 10 slots de anúncio para conteúdo e 10 para widgets.
-* Inserção automática em 10 posições: início, meio e fim do post, após a tag
+* Inserção automática em 11 posições: início, meio e fim do post, após a tag
   `<!--more-->`, antes do último parágrafo, após o parágrafo N (três slots
-  independentes), após a imagem N e após um elemento com uma classe CSS
-  ("After Class" — vale para a página inteira, inclusive templates de
+  independentes), após a imagem N e após um elemento com uma classe CSS (dois
+  slots "After Class" — valem para a página inteira, inclusive templates de
   categoria).
 * Limite de anúncios por página, aplicado a inserção automática, shortcode e
   widget somados.
@@ -148,6 +148,11 @@ pessoal sem consentimento. Os números do AdSense são a fonte confiável de
 qualquer forma — os do plugin nunca batem com os da rede.
 
 == Changelog ==
+
+= 1.2.2 =
+* Segunda posição "After Class": dois anúncios, cada um depois de uma classe
+  CSS diferente (ou da mesma).
+* A importação do QUADS preenche as duas posições "After Class".
 
 = 1.2.1 =
 * Versionamento só por tags do GitHub (`vX.Y.Z`): sem GitHub Action e sem

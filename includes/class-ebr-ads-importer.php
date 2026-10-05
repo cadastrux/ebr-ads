@@ -227,12 +227,14 @@ class EBR_Ads_Importer {
 	}
 
 	/**
-	 * Anúncio do painel novo do QUADS com posição "After Class" vira a nossa
-	 * posição class1, apontando para o slot onde o anúncio foi importado.
+	 * Anúncio do painel novo do QUADS com posição "After Class" vira uma das
+	 * nossas posições class1/class2, apontando para o slot onde o anúncio foi
+	 * importado.
 	 *
-	 * Só existe uma posição class1; o primeiro anúncio "After Class" encontrado
-	 * fica com ela. O QUADS inseria depois de TODAS as ocorrências da classe,
-	 * então o flag "todas" vem ligado para manter o comportamento.
+	 * Os anúncios "After Class" ocupam as posições livres na ordem em que
+	 * aparecem; além de duas, os demais ficam sem posição. O QUADS inseria
+	 * depois de TODAS as ocorrências da classe, então o flag "todas" vem
+	 * ligado para manter o comportamento.
 	 *
 	 * @param array  $old      Anúncio no formato QUADS.
 	 * @param string $slot     Slot de destino ('ad5').
@@ -243,7 +245,14 @@ class EBR_Ads_Importer {
 		if ( ! isset( $old['position'] ) || 'ad_after_class' !== $old['position'] ) {
 			return;
 		}
-		if ( ! empty( $draft['positions']['class1']['enabled'] ) ) {
+		$free = null;
+		foreach ( EBR_Ads_Schema::positions() as $key => $meta ) {
+			if ( ! empty( $meta['class'] ) && empty( $draft['positions'][ $key ]['enabled'] ) ) {
+				$free = $key;
+				break;
+			}
+		}
+		if ( null === $free ) {
 			return;
 		}
 		if ( ! preg_match( '/^ad(\d+)$/', $slot, $m ) ) {
@@ -257,7 +266,7 @@ class EBR_Ads_Importer {
 			return;
 		}
 
-		$draft['positions']['class1'] = array(
+		$draft['positions'][ $free ] = array(
 			'enabled'    => true,
 			'ad'         => (int) $m[1],
 			'count'      => 1,

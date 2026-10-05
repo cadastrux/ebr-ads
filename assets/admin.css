@@ -1,0 +1,110 @@
+/* Painel EBR Ads — layout clássico. */
+
+.ebr-ads .ebr-subtabs {
+	margin-top: 18px;
+	border-bottom: 1px solid #c3c4c7;
+	padding-bottom: 0;
+}
+
+.ebr-ads .ebr-subtabs .nav-tab {
+	font-size: 13px;
+	padding: 5px 10px;
+}
+
+.ebr-ads h3 {
+	margin: 26px 0 8px;
+	font-size: 15px;
+}
+
+/* Tabela de posições */
+.ebr-positions {
+	border-collapse: collapse;
+	margin-bottom: 8px;
+}
+
+.ebr-positions td {
+	padding: 5px 10px 5px 0;
+	vertical-align: middle;
+}
+
+.ebr-positions .ebr-col-check {
+	white-space: nowrap;
+}
+
+.ebr-positions .ebr-col-ad select {
+	min-width: 160px;
+}
+
+.ebr-positions .ebr-col-label {
+	white-space: nowrap;
+}
+
+.ebr-positions .ebr-count {
+	min-width: 70px;
+	margin: 0 4px;
+}
+
+.ebr-positions .ebr-arrow {
+	color: #646970;
+	margin: 0 4px;
+}
+
+/* Um select desabilitado precisa parecer desabilitado. */
+.ebr-positions select:disabled {
+	background: #f0f0f1;
+	color: #8c8f94;
+}
+
+.ebr-cb {
+	margin-right: 18px;
+	display: inline-block;
+}
+
+.ebr-posttypes {
+	min-width: 260px;
+}
+
+/* Caixas de anúncio */
+.ebr-ad-box {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-left: 4px solid #2271b1;
+	padding: 4px 16px 12px;
+	margin: 14px 0;
+	max-width: 900px;
+}
+
+.ebr-ad-box h3 {
+	margin: 12px 0 4px;
+}
+
+.ebr-ad-box .ebr-slot-id {
+	font-weight: 400;
+	font-size: 12px;
+	color: #646970;
+	margin-left: 8px;
+}
+
+.ebr-ad-box .form-table th {
+	width: 160px;
+	padding: 10px 10px 10px 0;
+}
+
+.ebr-ad-box .form-table td {
+	padding: 10px 0;
+}
+
+.ebr-ad-box textarea[disabled] {
+	background: #f6f7f7;
+	color: #50575e;
+}
+
+.ebr-caps {
+	max-width: 760px;
+}
+
+.ebr-caps td:last-child,
+.ebr-caps th:last-child {
+	text-align: center;
+	width: 90px;
+}

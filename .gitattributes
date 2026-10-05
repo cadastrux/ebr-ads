@@ -1,0 +1,8 @@
+# Normaliza finais de linha no repositório.
+* text=auto
+
+# Fora do ebr-ads.zip (git archive) — não fazem parte do plugin instalado.
+/.github        export-ignore
+/.gitattributes export-ignore
+/.gitignore     export-ignore
+/README.md      export-ignore

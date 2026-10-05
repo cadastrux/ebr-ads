@@ -100,6 +100,7 @@ class EBR_Ads_Importer {
 				if ( '' !== trim( (string) $draft['ads'][ $slot ]['code'] ) ) {
 					$summary['ads']++;
 				}
+				self::map_after_class( $old, $slot, $draft, $summary );
 			}
 		}
 
@@ -115,6 +116,7 @@ class EBR_Ads_Importer {
 				}
 				$draft['ads'][ $free ] = self::map_ad( $ad, $draft['ads'][ $free ] );
 				$summary['ads']++;
+				self::map_after_class( $ad, $free, $draft, $summary );
 			}
 		}
 
@@ -225,6 +227,47 @@ class EBR_Ads_Importer {
 	}
 
 	/**
+	 * Anúncio do painel novo do QUADS com posição "After Class" vira a nossa
+	 * posição class1, apontando para o slot onde o anúncio foi importado.
+	 *
+	 * Só existe uma posição class1; o primeiro anúncio "After Class" encontrado
+	 * fica com ela. O QUADS inseria depois de TODAS as ocorrências da classe,
+	 * então o flag "todas" vem ligado para manter o comportamento.
+	 *
+	 * @param array  $old      Anúncio no formato QUADS.
+	 * @param string $slot     Slot de destino ('ad5').
+	 * @param array  $draft    Settings em construção (por referência).
+	 * @param array  $summary  Resumo da importação (por referência).
+	 */
+	private static function map_after_class( array $old, $slot, array &$draft, array &$summary ) {
+		if ( ! isset( $old['position'] ) || 'ad_after_class' !== $old['position'] ) {
+			return;
+		}
+		if ( ! empty( $draft['positions']['class1']['enabled'] ) ) {
+			return;
+		}
+		if ( ! preg_match( '/^ad(\d+)$/', $slot, $m ) ) {
+			return;
+		}
+
+		// Validado de novo em sanitize_settings(); aqui só evitamos ligar a
+		// posição com uma classe que seria descartada.
+		$class = EBR_Ads_Schema::validate_css_class( isset( $old['after_class_name'] ) ? $old['after_class_name'] : '' );
+		if ( '' === $class ) {
+			return;
+		}
+
+		$draft['positions']['class1'] = array(
+			'enabled'    => true,
+			'ad'         => (int) $m[1],
+			'count'      => 1,
+			'flag'       => true,
+			'class_name' => $class,
+		);
+		$summary['positions']++;
+	}
+
+	/**
 	 * Lê os anúncios do CPT 'quads-ads', se existir.
 	 *
 	 * @return array Lista no formato do map_ad().
@@ -248,10 +291,13 @@ class EBR_Ads_Importer {
 				continue;
 			}
 			$out[] = array(
-				'label'  => $post->post_title,
-				'code'   => $code,
-				'align'  => get_post_meta( $post->ID, 'align', true ),
-				'margin' => get_post_meta( $post->ID, 'margin', true ),
+				'label'            => $post->post_title,
+				'code'             => $code,
+				'align'            => get_post_meta( $post->ID, 'align', true ),
+				'margin'           => get_post_meta( $post->ID, 'margin', true ),
+				// Rascunho no QUADS não era exibido; não ligamos posição para ele.
+				'position'         => 'publish' === $post->post_status ? get_post_meta( $post->ID, 'position', true ) : '',
+				'after_class_name' => get_post_meta( $post->ID, 'after_class_name', true ),
 			);
 		}
 

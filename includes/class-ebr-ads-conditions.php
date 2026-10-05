@@ -18,9 +18,12 @@ class EBR_Ads_Conditions {
 	/**
 	 * A inserção automática deve ocorrer neste request?
 	 *
+	 * @param int|null $post_id Post cujas marcações valem. null = post do loop
+	 *                          atual (inserção no conteúdo); 0 = nenhum (decisão
+	 *                          da página inteira fora de páginas singulares).
 	 * @return bool
 	 */
-	public static function should_display() {
+	public static function should_display( $post_id = null ) {
 		$settings = EBR_Ads_Store::get();
 
 		// Nunca no admin, em feeds, em REST ou em requests AJAX.
@@ -35,7 +38,7 @@ class EBR_Ads_Conditions {
 			return false;
 		}
 
-		if ( self::post_disabled() ) {
+		if ( self::post_disabled( $post_id ) ) {
 			return false;
 		}
 
@@ -53,7 +56,7 @@ class EBR_Ads_Conditions {
 		}
 
 		if ( is_singular() ) {
-			$post_type = get_post_type();
+			$post_type = $post_id ? get_post_type( $post_id ) : get_post_type();
 			return in_array( $post_type, (array) $settings['post_types'], true );
 		}
 

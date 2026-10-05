@@ -25,6 +25,11 @@
 		if ( count ) {
 			count.disabled = ! checkbox.checked;
 		}
+
+		var className = row.querySelector( '.ebr-class-name' );
+		if ( className ) {
+			className.disabled = ! checkbox.checked;
+		}
 	}
 
 	function syncType( select ) {

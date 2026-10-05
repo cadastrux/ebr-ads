@@ -49,8 +49,15 @@
 	margin: 0 4px;
 }
 
-/* Um select desabilitado precisa parecer desabilitado. */
-.ebr-positions select:disabled {
+.ebr-positions .ebr-class-name {
+	width: 180px;
+	margin: 0 4px;
+	font-family: Consolas, Monaco, monospace;
+}
+
+/* Um campo desabilitado precisa parecer desabilitado. */
+.ebr-positions select:disabled,
+.ebr-positions input[type="text"]:disabled {
 	background: #f0f0f1;
 	color: #8c8f94;
 }

@@ -283,9 +283,13 @@ class EBR_Ads_Admin {
 				__( 'After Image', 'ebr-ads' ),
 				__( 'after Image\'s outer <div> wp-caption if any.', 'ebr-ads' )
 			);
+			self::class_row( 'class1', $positions );
 			?>
 			</tbody>
 		</table>
+		<p class="description">
+			<?php esc_html_e( 'After Class: o anúncio entra logo depois do elemento que tem esta classe CSS, em qualquer lugar da página — inclusive fora do texto do post, como no template de categoria. Digite só o nome, sem o ponto (ex.: cat-content). Segue a mesma Visibility abaixo.', 'ebr-ads' ); ?>
+		</p>
 
 		<h3><?php esc_html_e( 'Visibility', 'ebr-ads' ); ?></h3>
 		<p>
@@ -365,6 +369,52 @@ class EBR_Ads_Admin {
 						<?php echo esc_html( $flag_text ); ?>
 					</label>
 				<?php endif; ?>
+			</td>
+		</tr>
+		<?php
+	}
+
+	/**
+	 * Linha "After Class": mesmo layout das demais, com um campo de texto no
+	 * lugar do contador.
+	 *
+	 * @param string $key       Chave da posição.
+	 * @param array  $positions Todas as posições.
+	 */
+	private static function class_row( $key, array $positions ) {
+		$config = $positions[ $key ];
+		?>
+		<tr>
+			<td class="ebr-col-check">
+				<label>
+					<input type="checkbox"
+						class="ebr-assign"
+						name="positions[<?php echo esc_attr( $key ); ?>][enabled]"
+						value="1" <?php checked( ! empty( $config['enabled'] ) ); ?>>
+					<?php esc_html_e( 'Assign', 'ebr-ads' ); ?>
+				</label>
+			</td>
+			<td class="ebr-col-ad">
+				<?php self::ad_select( 'positions[' . $key . '][ad]', (int) $config['ad'], empty( $config['enabled'] ) ); ?>
+			</td>
+			<td class="ebr-col-label">
+				<?php esc_html_e( 'After Class', 'ebr-ads' ); ?>
+				<input type="text"
+					class="ebr-class-name"
+					name="positions[<?php echo esc_attr( $key ); ?>][class_name]"
+					value="<?php echo esc_attr( $config['class_name'] ); ?>"
+					placeholder="cat-content"
+					maxlength="100"
+					pattern="\.?-?[_a-zA-Z][_a-zA-Z0-9\-]*"
+					spellcheck="false"
+					<?php disabled( empty( $config['enabled'] ) ); ?>>
+				<span class="ebr-arrow">&rarr;</span>
+				<label>
+					<input type="checkbox"
+						name="positions[<?php echo esc_attr( $key ); ?>][flag]"
+						value="1" <?php checked( ! empty( $config['flag'] ) ); ?>>
+					<?php esc_html_e( 'after every element with this class, not only the first.', 'ebr-ads' ); ?>
+				</label>
 			</td>
 		</tr>
 		<?php
@@ -796,6 +846,9 @@ class EBR_Ads_Admin {
 					}
 					if ( isset( $row['count'] ) ) {
 						$merged['positions'][ $pos_key ]['count'] = $row['count'];
+					}
+					if ( isset( $row['class_name'] ) ) {
+						$merged['positions'][ $pos_key ]['class_name'] = $row['class_name'];
 					}
 				}
 

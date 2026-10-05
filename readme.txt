@@ -4,7 +4,7 @@ Tags: ads, adsense, advertising, banner
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,9 +19,11 @@ pagamento.
 = O que faz =
 
 * 10 slots de anúncio para conteúdo e 10 para widgets.
-* Inserção automática em 9 posições: início, meio e fim do post, após a tag
+* Inserção automática em 10 posições: início, meio e fim do post, após a tag
   `<!--more-->`, antes do último parágrafo, após o parágrafo N (três slots
-  independentes) e após a imagem N.
+  independentes), após a imagem N e após um elemento com uma classe CSS
+  ("After Class" — vale para a página inteira, inclusive templates de
+  categoria).
 * Limite de anúncios por página, aplicado a inserção automática, shortcode e
   widget somados.
 * Condições de exibição por post type, home, categoria, arquivo, tag, e opção
@@ -140,6 +142,14 @@ pessoal sem consentimento. Os números do AdSense são a fonte confiável de
 qualquer forma — os do plugin nunca batem com os da rede.
 
 == Changelog ==
+
+= 1.2.0 =
+* Nova posição "After Class": insere o anúncio logo depois do elemento com a
+  classe CSS informada (ex.: `cat-content`), em qualquer lugar da página.
+  Opção de inserir só na primeira ocorrência ou em todas.
+* O HTML da página não é reescrito: o anúncio é inserido como texto, sem
+  passar por DOMDocument.
+* A importação do QUADS traz o anúncio "After Class" do painel novo.
 
 = 1.1.0 =
 * Caixa "EBR Ads - Ocultar anúncios" na edição de posts e páginas, com as

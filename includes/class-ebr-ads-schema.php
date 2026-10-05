@@ -40,6 +40,9 @@ class EBR_Ads_Schema {
 			'para2'     => array( 'label' => __( 'After Paragraph', 'ebr-ads' ), 'counted' => true ),
 			'para3'     => array( 'label' => __( 'After Paragraph', 'ebr-ads' ), 'counted' => true ),
 			'image1'    => array( 'label' => __( 'After Image', 'ebr-ads' ), 'counted' => true, 'image' => true ),
+			// Depois de um elemento com esta classe CSS, em qualquer lugar da
+			// página — ver EBR_Ads_Page_Injector.
+			'class1'    => array( 'label' => __( 'After Class', 'ebr-ads' ), 'class' => true ),
 		);
 	}
 
@@ -97,10 +100,11 @@ class EBR_Ads_Schema {
 		$positions = array();
 		foreach ( self::positions() as $key => $meta ) {
 			$positions[ $key ] = array(
-				'enabled' => false,
-				'ad'      => 0,
-				'count'   => 1,
-				'flag'    => false,
+				'enabled'    => false,
+				'ad'         => 0,
+				'count'      => 1,
+				'flag'       => false,
+				'class_name' => '',
 			);
 		}
 
@@ -184,10 +188,11 @@ class EBR_Ads_Schema {
 			$raw = isset( $input['positions'][ $key ] ) && is_array( $input['positions'][ $key ] ) ? $input['positions'][ $key ] : array();
 
 			$out['positions'][ $key ] = array(
-				'enabled' => ! empty( $raw['enabled'] ),
-				'ad'      => self::validate_slot( isset( $raw['ad'] ) ? $raw['ad'] : 0 ),
-				'count'   => self::clamp_int( isset( $raw['count'] ) ? $raw['count'] : 1, 1, 100, 1 ),
-				'flag'    => ! empty( $raw['flag'] ),
+				'enabled'    => ! empty( $raw['enabled'] ),
+				'ad'         => self::validate_slot( isset( $raw['ad'] ) ? $raw['ad'] : 0 ),
+				'count'      => self::clamp_int( isset( $raw['count'] ) ? $raw['count'] : 1, 1, 100, 1 ),
+				'flag'       => ! empty( $raw['flag'] ),
+				'class_name' => empty( $meta['class'] ) ? '' : self::validate_css_class( isset( $raw['class_name'] ) ? $raw['class_name'] : '' ),
 			);
 		}
 
@@ -317,6 +322,32 @@ class EBR_Ads_Schema {
 		$slot = (int) $value;
 
 		return ( $slot >= 0 && $slot <= self::AD_SLOTS ) ? $slot : 0;
+	}
+
+	/**
+	 * Valida um nome de classe CSS (uma só, sem o ponto).
+	 *
+	 * O valor vira parte de uma expressão regular e é comparado com o HTML da
+	 * página, então aceitamos apenas a gramática de identificador CSS — letras,
+	 * dígitos, '-' e '_'. Um ponto inicial ('.cat-content') é tolerado, porque é
+	 * como se escreve a classe num seletor. Qualquer outra coisa vira '' (a
+	 * posição simplesmente não insere nada). §8: validar, não "consertar".
+	 *
+	 * @param mixed $value Valor cru.
+	 * @return string
+	 */
+	public static function validate_css_class( $value ) {
+		if ( ! is_scalar( $value ) ) {
+			return '';
+		}
+
+		$value = ltrim( trim( (string) $value ), '.' );
+
+		if ( strlen( $value ) > 100 || ! preg_match( '/^-?[_a-zA-Z][_a-zA-Z0-9-]*$/', $value ) ) {
+			return '';
+		}
+
+		return $value;
 	}
 
 	/**

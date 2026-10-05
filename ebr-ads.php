@@ -4,7 +4,7 @@
  * Plugin URI:  https://github.com/cadastrux/ebr-ads
  * Update URI:  https://github.com/cadastrux/ebr-ads
  * Description: Gerenciador de anúncios enxuto: inserção automática por posição, shortcode, widget e condições de exibição. Sem tracking, sem endpoints públicos. Atualizações via releases do GitHub.
- * Version:     1.1.0
+ * Version:     1.2.0
  * Author:      EBR Network
  * License:     GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -19,7 +19,7 @@
 defined( 'ABSPATH' ) || exit;
 
 // Precisa bater com o cabeçalho "Version" acima — a Action de release verifica.
-define( 'EBR_ADS_VERSION', '1.1.0' );
+define( 'EBR_ADS_VERSION', '1.2.0' );
 define( 'EBR_ADS_FILE', __FILE__ );
 define( 'EBR_ADS_DIR', plugin_dir_path( __FILE__ ) );
 define( 'EBR_ADS_URL', plugin_dir_url( __FILE__ ) );
@@ -40,6 +40,7 @@ require_once EBR_ADS_DIR . 'includes/class-ebr-ads-importer.php';
 require_once EBR_ADS_DIR . 'includes/class-ebr-ads-conditions.php';
 require_once EBR_ADS_DIR . 'includes/class-ebr-ads-renderer.php';
 require_once EBR_ADS_DIR . 'includes/class-ebr-ads-injector.php';
+require_once EBR_ADS_DIR . 'includes/class-ebr-ads-page-injector.php';
 require_once EBR_ADS_DIR . 'includes/class-ebr-ads-shortcode.php';
 require_once EBR_ADS_DIR . 'includes/class-ebr-ads-widget.php';
 require_once EBR_ADS_DIR . 'includes/class-ebr-ads-editor.php';
@@ -113,6 +114,7 @@ add_action( 'wp_initialize_site', 'ebr_ads_new_site', 100 );
  */
 function ebr_ads_init() {
 	EBR_Ads_Injector::init();
+	EBR_Ads_Page_Injector::init();
 	EBR_Ads_Shortcode::init();
 	EBR_Ads_Widget::init();
 
